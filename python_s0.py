@@ -22,7 +22,7 @@ global global_deltat
 
 global global_kw
 global global_kwh
-global global_impuls
+global global_impulse
 
 # current counter will be persisted in
 DATA_FILE = "/var/lib/ladestation_s0/value"
@@ -89,7 +89,7 @@ def gpio_callback():
     global global_last_time
     global global_timestamp
     global global_deltat
-    global global_impuls
+    global global_impulse
 
     # get time stamp
     global_timestamp = time.time()
@@ -100,10 +100,14 @@ def gpio_callback():
         global_deltat = 0
     global_last_time = global_timestamp
 
-    global_impuls += 1
+    global_impulse += 1
 
 
 if __name__ == '__main__':
+    global global_kw
+    global global_kwh
+    global global_impulse
+
     print('Starting up ...')
     logger.info('Starting up...')
     time.sleep(3)
@@ -139,10 +143,6 @@ if __name__ == '__main__':
     wiringpi.pullUpDnControl(PIN_TO_SENSE, wiringpi.GPIO.PUD_DOWN)
     wiringpi.wiringPiISR(PIN_TO_SENSE, wiringpi.GPIO.INT_EDGE_RISING, gpio_callback)
 
-    global global_kw
-    global global_kwh
-    global global_impuls
-
     print('Startup complete')
     logger.info('Startup complete.')
     # Tell systemd that our service is ready
@@ -151,10 +151,10 @@ if __name__ == '__main__':
     while True:
         # data = q.read()
         # print(data)
-        if global_impuls > 0:
-            global_kwh = global_impuls / 100
+        if global_impulse > 0:
+            global_kwh = global_impulse / 100
 
-        logger.info('imp: %d, kwh: %d, kw: %d', global_impuls, global_kwh, global_kw)
+        logger.info('imp: %d, kwh: %d, kw: %d', global_impulse, global_kwh, global_kw)
 
         # publish(INITIAL_VALUE)
         # if data['triggered'] == 1:
