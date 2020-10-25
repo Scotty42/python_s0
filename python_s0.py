@@ -16,6 +16,10 @@ IMPULSE_PER_KWH = 100
 SECONDS_PER_HOUR = 3600
 BASE_POWER = 1000
 
+global global_last_time
+global global_timestamp
+global global_deltat
+
 # current counter will be persisted in
 DATA_FILE = "/var/lib/ladestation_s0/value"
 
@@ -51,7 +55,7 @@ def writeValue(value):
 
 
 def publish(value):
-    client.publish(MQTT_PREFIX + "s0_value", INITIAL_VALUE, qos=0, retain=True)
+    client.publish(MQTT_PREFIX + "kWh_value", INITIAL_VALUE, qos=0, retain=True)
 
 
 # The callback for when the client receives a CONNACK response from the server.
@@ -78,7 +82,18 @@ def on_publish(client, userdata, mid):
 
 # callback for gpio
 def gpio_callback():
-    print ""
+    global global_last_time
+    global global_timestamp
+    global global_deltat
+
+    # get time stamp
+    global_timestamp = time.time()
+    # calculate
+    if global_last_time > 0:
+        global_deltat = global_timestamp - global_last_time
+    else:
+        global_deltat = 0
+    global_last_time = global_timestamp
 
 
 if __name__ == '__main__':
@@ -132,7 +147,7 @@ if __name__ == '__main__':
         # if data['triggered'] == 1:
            # INITIAL_VALUE += 0.01
            # writeValue(INITIAL_VALUE)
-           #
+           # #client.publish(MQTT_PREFIX + "gas_B", data['b'])
            # publish(INITIAL_VALUE)
 
         # 10s
@@ -140,3 +155,5 @@ if __name__ == '__main__':
 
 
 
+# kWh global = counter / 100
+# kW momentan : <time delta between Imp> / (3600/100) = x; 1000 * <Imp> / x = W
