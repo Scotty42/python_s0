@@ -151,7 +151,7 @@ if __name__ == '__main__':
            # publish(INITIAL_VALUE)
 
         # 10s
-        wiringpi.sleep(10000)
+        time.sleep(10)
 
 
 
