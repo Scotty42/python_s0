@@ -15,6 +15,8 @@ INITIAL_VALUE = 947.65
 IMPULSE_PER_KWH = 100
 SECONDS_PER_HOUR = 3600
 BASE_POWER = 1000
+STEPS = 100
+SECONDS_PER_IMP = SECONDS_PER_HOUR / STEPS
 
 global_last_time = 0
 global_timestamp = 0
@@ -23,6 +25,9 @@ global_deltat = 0
 global_kw = 0
 global_kwh = 0
 global_impulse = 0
+
+global_deltai = 0
+global_last_imp = 0
 
 # current counter will be persisted in
 DATA_FILE = "/var/lib/ladestation_s0/value"
@@ -90,17 +95,22 @@ def gpio_callback():
     global global_timestamp
     global global_deltat
     global global_impulse
+    global global_kw
 
     # get time stamp
     global_timestamp = time.time()
-    # calculate
     if global_last_time > 0:
         global_deltat = global_timestamp - global_last_time
     else:
         global_deltat = 0
     global_last_time = global_timestamp
 
+    # increment
     global_impulse += 1
+
+    # Pmoment
+    if global_deltat > 0:
+        global_kw = BASE_POWER * 2 / (global_deltat / SECONDS_PER_IMP)
 
 
 if __name__ == '__main__':
@@ -144,31 +154,23 @@ if __name__ == '__main__':
     # Tell systemd that our service is ready
     sd.notify(sd.Notification.READY)
 
-    while True:
-        # data = q.read()
-        # print(data)
-        if global_impulse > 0:
-            global_kwh = global_impulse / 100
+    try:
+        while True:
+            # data = q.read()
+            # print(data)
+            if global_impulse > 0:
+                global_kwh = global_impulse / STEPS
 
-        logger.info('imp: %d, kwh: %d, kw: %d', global_impulse, global_kwh, global_kw)
+            logger.info('imp: %d, kwh: %d, kw: %d', global_impulse, INITIAL_VALUE, global_kw)
 
-        # publish(INITIAL_VALUE)
-        # if data['triggered'] == 1:
-           # INITIAL_VALUE += 0.01
-           # writeValue(INITIAL_VALUE)
-           # #client.publish(MQTT_PREFIX + "gas_B", data['b'])
-           # publish(INITIAL_VALUE)
+            INITIAL_VALUE += global_kwh
+            writeValue(INITIAL_VALUE)
 
-        INITIAL_VALUE += global_kwh
-        writeValue(INITIAL_VALUE)
+            client.publish(MQTT_PREFIX + "kWh_value", INITIAL_VALUE)
+            client.publish(MQTT_PREFIX + "kW_value", global_kw)
 
-        client.publish(MQTT_PREFIX + "kWh_value", INITIAL_VALUE)
-        client.publish(MQTT_PREFIX + "kW_value", global_kw)
+            # 10s
+            time.sleep(10)
+    except KeyboardInterrupt:
+        print('Strg+c pressed. Bye')
 
-        # 10s
-        time.sleep(10)
-
-
-
-# kWh global = counter / 100
-# kW momentan : <time delta between Imp> / (3600/100) = x; 1000 * <Imp> / x = W
