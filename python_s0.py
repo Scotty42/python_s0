@@ -107,10 +107,6 @@ if __name__ == '__main__':
     print('Starting up ...')
     logger.info('Starting up...')
     time.sleep(3)
-    print('Startup complete')
-    logger.info('Startup complete.')
-    # Tell systemd that our service is ready
-    sd.notify(sd.Notification.READY)
 
     if not os.path.exists(DATA_FILE):
         print("Write initial value to data file: " + str(INITIAL_VALUE))
@@ -146,6 +142,11 @@ if __name__ == '__main__':
     global global_kw
     global global_kwh
     global global_impuls
+
+    print('Startup complete')
+    logger.info('Startup complete.')
+    # Tell systemd that our service is ready
+    sd.notify(sd.Notification.READY)
 
     while True:
         # data = q.read()
