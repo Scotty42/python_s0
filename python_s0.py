@@ -20,6 +20,10 @@ global global_last_time
 global global_timestamp
 global global_deltat
 
+global global_kw
+global global_kwh
+global global_impuls
+
 # current counter will be persisted in
 DATA_FILE = "/var/lib/ladestation_s0/value"
 
@@ -85,6 +89,7 @@ def gpio_callback():
     global global_last_time
     global global_timestamp
     global global_deltat
+    global global_impuls
 
     # get time stamp
     global_timestamp = time.time()
@@ -94,6 +99,8 @@ def gpio_callback():
     else:
         global_deltat = 0
     global_last_time = global_timestamp
+
+    global_impuls += 1
 
 
 if __name__ == '__main__':
@@ -136,19 +143,30 @@ if __name__ == '__main__':
     wiringpi.pullUpDnControl(PIN_TO_SENSE, wiringpi.GPIO.PUD_DOWN)
     wiringpi.wiringPiISR(PIN_TO_SENSE, wiringpi.GPIO.INT_EDGE_RISING, gpio_callback)
 
+    global global_kw
+    global global_kwh
+    global global_impuls
+
     while True:
         # data = q.read()
-
         # print(data)
-        # logger.info('%s', data)
+        if global_impuls > 0:
+            global_kwh = global_impuls / 100
 
-        publish(INITIAL_VALUE)
+        logger.info('imp: %d, kwh: %d, kw: %d', global_impuls, global_kwh, global_kw)
 
+        # publish(INITIAL_VALUE)
         # if data['triggered'] == 1:
            # INITIAL_VALUE += 0.01
            # writeValue(INITIAL_VALUE)
            # #client.publish(MQTT_PREFIX + "gas_B", data['b'])
            # publish(INITIAL_VALUE)
+
+        INITIAL_VALUE += global_kwh
+        writeValue(INITIAL_VALUE)
+
+        client.publish(MQTT_PREFIX + "kWh_value", INITIAL_VALUE)
+        client.publish(MQTT_PREFIX + "kW_value", global_kw)
 
         # 10s
         time.sleep(10)
