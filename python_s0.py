@@ -163,7 +163,7 @@ if __name__ == '__main__':
 
             # Pmoment
             if global_deltat > 0:
-                global_w = BASE_POWER * global_deltai / (10 / SECONDS_PER_IMP)
+                global_w = BASE_POWER / (global_deltat / SECONDS_PER_IMP)
 
             logger.info('imp: %d, kwh: %d, kw: %d', global_impulse, INITIAL_VALUE, global_w / 1000)
 
