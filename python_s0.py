@@ -108,11 +108,6 @@ def gpio_callback():
     # increment
     global_impulse += 1
 
-    # Pmoment
-    if global_deltat > 0:
-        global_w = BASE_POWER * 2 / (global_deltat / SECONDS_PER_IMP)
-
-
 if __name__ == '__main__':
     print('Starting up ...')
     logger.info('Starting up...')
@@ -165,6 +160,10 @@ if __name__ == '__main__':
 
             if global_deltai > 0:
                 global_kwh = global_deltai / STEPS
+
+            # Pmoment
+            if global_deltat > 0:
+                global_w = BASE_POWER * global_deltai / (global_deltat / SECONDS_PER_IMP)
 
             logger.info('imp: %d, kwh: %d, kw: %d', global_impulse, INITIAL_VALUE, global_w / 1000)
 
