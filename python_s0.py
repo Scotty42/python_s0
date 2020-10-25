@@ -16,13 +16,13 @@ IMPULSE_PER_KWH = 100
 SECONDS_PER_HOUR = 3600
 BASE_POWER = 1000
 
-global global_last_time
-global global_timestamp
-global global_deltat
+global_last_time = 0
+global_timestamp = 0
+global_deltat = 0
 
-global global_kw
-global global_kwh
-global global_impulse
+global_kw = 0
+global_kwh = 0
+global_impulse = 0
 
 # current counter will be persisted in
 DATA_FILE = "/var/lib/ladestation_s0/value"
