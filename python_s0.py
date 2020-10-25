@@ -104,10 +104,6 @@ def gpio_callback():
 
 
 if __name__ == '__main__':
-    global global_kw
-    global global_kwh
-    global global_impulse
-
     print('Starting up ...')
     logger.info('Starting up...')
     time.sleep(3)
