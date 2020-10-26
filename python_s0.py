@@ -124,7 +124,7 @@ if __name__ == '__main__':
     else:
         INITIAL_VALUE = readValue()
 
-    client = mqtt.Client()
+    client = mqtt.Client(client_id="easymeter_s0", clean_session=True)
     client.on_connect = on_connect
     client.on_message = on_message
     # client.on_publish = on_publish
