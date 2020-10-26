@@ -16,13 +16,13 @@ IMPULSE_PER_KWH = 100
 SECONDS_PER_HOUR = 3600
 BASE_POWER = 1000
 STEPS = 100
-SECONDS_PER_IMP = SECONDS_PER_HOUR / STEPS
+POWER_PER_IMP = SECONDS_PER_HOUR / STEPS  # kWs
 
 global_last_time = 0
 global_timestamp = 0
 global_deltat = 0
 
-global_w = 0
+global_kw = 0
 global_kwh = 0
 global_impulse = 0
 
@@ -95,7 +95,7 @@ def gpio_callback():
     global global_timestamp
     global global_deltat
     global global_impulse
-    global global_w
+    global global_kw
 
     # get time stamp
     global_timestamp = time.time()
@@ -162,16 +162,19 @@ if __name__ == '__main__':
                 global_kwh = global_deltai / STEPS
 
             # Pmoment
-            # if global_deltat > 0:
-            #    global_w = BASE_POWER * 2 / (global_deltat / SECONDS_PER_IMP)
+            # Energie = Leistung*Zeit -> Leistung = Energie/Zeit
+            if global_deltat > 0 and global_deltai > 0:
+                global_kw = POWER_PER_IMP / global_deltat
+            else:
+                global_kw = 0
 
-            logger.info('imp: %d, kwh: %d, kw: %d', global_impulse, INITIAL_VALUE, 0)
+            logger.info('imp: %d, kwh: %d, kw: %d', global_impulse, INITIAL_VALUE, global_kw)
 
             INITIAL_VALUE += global_kwh
             writeValue(INITIAL_VALUE)
 
             client.publish(MQTT_PREFIX + "kWh_value", INITIAL_VALUE)
-            client.publish(MQTT_PREFIX + "kW_value", 0)
+            client.publish(MQTT_PREFIX + "kW_value", global_kw)
 
             # 10s
             time.sleep(10)
