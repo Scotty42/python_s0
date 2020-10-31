@@ -159,12 +159,11 @@ if __name__ == '__main__':
             global_last_imp = global_impulse
 
             if global_deltai > 0:
+                # Energy
                 global_kwh = global_deltai / STEPS
-
-            # Pmoment
-            # Energie = Leistung*Zeit -> Leistung = Energie/Zeit
-            if global_deltat > 0:
-                global_kw = POWER_PER_IMP / global_deltat 
+                # Avg. Power
+                if global_deltat > 0.03:
+                    global_kw = POWER_PER_IMP / global_deltat
             else:
                 global_kw = 0
 
