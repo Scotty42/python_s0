@@ -162,12 +162,12 @@ if __name__ == '__main__':
                 # Energy
                 global_kwh = global_deltai / STEPS
                 # Avg. Power
-                if global_deltat > 0.03:
+                if global_deltat > 0.04:
                     global_kw = POWER_PER_IMP / global_deltat
             else:
                 global_kw = 0
 
-            logger.info('last_i: %d, last_t: %.2f, imp: %d, kwh: %d, kw: %.1f', global_deltai, global_deltat, global_impulse, INITIAL_VALUE, global_kw)
+            logger.info('last_i: %d, last_t: %.3f, imp: %d, kwh: %.1f, kw: %.1f', global_deltai, global_deltat, global_impulse, INITIAL_VALUE, global_kw)
 
             INITIAL_VALUE += global_kwh
             writeValue(INITIAL_VALUE)
