@@ -10,7 +10,7 @@ import wiringpi
 MQTT_PREFIX = "easymeter/ladestation_s0/"
 
 # current counter
-INITIAL_VALUE = 954.29
+INITIAL_VALUE = 967.48
 
 IMPULSE_PER_KWH = 1000
 SECONDS_PER_HOUR = 3600
