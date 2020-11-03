@@ -105,8 +105,11 @@ def gpio_callback():
         global_deltat = 0
     global_last_time = global_timestamp
 
-    # increment
-    global_impulse += 1
+    # increment if delta t is greater than 30-40ms = min pulse duration for S0
+    # otherwise gpio isr triggered more than once for the same S0 pulse
+    if global_deltat > 0.04: 
+        global_impulse += 1
+
 
 if __name__ == '__main__':
     print('Starting up ...')
