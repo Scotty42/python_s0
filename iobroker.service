@@ -1,0 +1,30 @@
+# /lib/systemd/system/iobroker.service
+# systemctl daemon-reload
+# systemctl enable iobroker.service
+# systemctl start iobroker.service
+
+[Unit]
+Description=Iobroker Python Service
+After=multi-user.target
+Conflicts=getty@tty1.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/python_s0/iobroker-client.py
+StandardInput=tty-force
+
+# Disable Python's buffering of STDOUT and STDERR, so that output from the
+# service shows up immediately in systemd's logs
+Environment=PYTHONUNBUFFERED=1
+
+# Automatically restart the service if it crashes
+Restart=on-failure
+
+# Our service will notify systemd once it is up and running
+Type=notify
+
+# Use a dedicated user to run our service
+User=markus
+
+[Install]
+WantedBy=multi-user.target

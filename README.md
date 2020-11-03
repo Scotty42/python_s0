@@ -5,3 +5,8 @@ Requirements for this project:
 * use delta time between impulses to calculate average power
 * transfer power and energy to MQTT broker
 
+Hints:
+* Ensure user account used to run iobroker-client.py is member of groups that own gpio devices. Like kmem, gpio, uucp.
+* To run as a systemd service, a sample service file is included. Change and use to fit the target system.
+
+
