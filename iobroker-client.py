@@ -10,7 +10,7 @@ import wiringpi
 MQTT_PREFIX = "easymeter/ladestation_s0/"
 
 # current counter
-INITIAL_VALUE = 973.14
+INITIAL_VALUE = 978.13
 
 IMPULSE_PER_KWH = 1000
 SECONDS_PER_HOUR = 3600
@@ -167,13 +167,13 @@ if __name__ == '__main__':
                 # Avg. Power
                 if global_deltat > 0.04:
                     global_kw = POWER_PER_IMP / global_deltat
+                # persist
+                INITIAL_VALUE += global_kwh
+                writeValue(INITIAL_VALUE)
             else:
                 global_kw = 0
 
             logger.info('last_i: %d, last_t: %.3f, imp: %d, kwh: %.1f, kw: %.1f', global_deltai, global_deltat, global_impulse, INITIAL_VALUE, global_kw)
-
-            INITIAL_VALUE += global_kwh
-            writeValue(INITIAL_VALUE)
 
             client.publish(MQTT_PREFIX + "kWh_value", INITIAL_VALUE)
             client.publish(MQTT_PREFIX + "kW_value", global_kw)
