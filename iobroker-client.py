@@ -30,6 +30,7 @@ global_deltai = 0
 global_last_imp = 0
 
 # current counter will be persisted in
+# touch before first start
 DATA_FILE = "/var/lib/ladestation_s0/value"
 
 # get an instance of the logger object this module will use
@@ -50,14 +51,14 @@ logger.addHandler(journald_handler)
 logger.setLevel(logging.DEBUG)
 
 
-def readValue():
+def readvalue():
     f = open(DATA_FILE, "r")
     value = float(f.readline())
     f.close()
     return value
 
 
-def writeValue(value):
+def writevalue(value):
     f = open(DATA_FILE, "w")
     f.write(str(value))
     f.close()
@@ -125,7 +126,7 @@ if __name__ == '__main__':
         f.write(str(INITIAL_VALUE))
         f.close()
     else:
-        INITIAL_VALUE = readValue()
+        INITIAL_VALUE = readvalue()
 
     client = mqtt.Client(client_id="easymeter_s0", clean_session=True)
     client.on_connect = on_connect
@@ -141,6 +142,7 @@ if __name__ == '__main__':
     print("Connecting to meter")
     logger.info('Connecting to meter')
 
+    # Pin number from BCM numbering scheme. 27 BCM = Pin 13 on physical connector
     PIN_TO_SENSE = 27
     wiringpi.wiringPiSetupGpio()
     wiringpi.pinMode(PIN_TO_SENSE, wiringpi.GPIO.INPUT)
@@ -154,7 +156,7 @@ if __name__ == '__main__':
 
     try:
         while True:
-
+            # Count only if any impulse was measured in ISR
             if global_last_imp > 0:
                 global_deltai = global_impulse - global_last_imp
             else:
@@ -169,7 +171,7 @@ if __name__ == '__main__':
                     global_kw = POWER_PER_IMP / global_deltat
                 # persist
                 INITIAL_VALUE += global_kwh
-                writeValue(INITIAL_VALUE)
+                writevalue(INITIAL_VALUE)
             else:
                 global_kw = 0
 
