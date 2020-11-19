@@ -77,6 +77,10 @@ def on_connect(client, userdata, flags, rc):
     # reconnect then subscriptions will be renewed.
     client.subscribe("$SYS/#")
 
+# The callback for when the client receives a CONNACK response from the server.
+def on_disconnect(client, userdata, rc):
+    print("Disconnected with result code {}".format(rc))
+    logger.info('Disconnected with result code {%s}', rc)
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
@@ -132,6 +136,7 @@ if __name__ == '__main__':
     client.on_connect = on_connect
     client.on_message = on_message
     # client.on_publish = on_publish
+    client.on_disconnect = on_disconnect
 
     print("Connecting to mqtt broker")
     logger.info('Connecting to mqtt broker')
@@ -179,6 +184,9 @@ if __name__ == '__main__':
 
             client.publish(MQTT_PREFIX + "kWh_value", INITIAL_VALUE)
             client.publish(MQTT_PREFIX + "kW_value", global_kw)
+
+            # on paho client loop
+            client.loop()
 
             # 10s
             time.sleep(10)
